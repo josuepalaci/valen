@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+        rel="stylesheet">
+    <title>¿Quieres ser mi Valentín?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #0a0a15;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .title {
+            position: absolute;
+            top: 50px;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-size: 3em;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        .message {
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-size: 1.5em;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            z-index: 10;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title">¿Quieres ser mi Valentín?</div>
+    <canvas id="canvas"></canvas>
+    <div class="message">Cada estrella brilla para ti, Adriana ✨</div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Estrellas de fondo
+        const stars = [];
+        const numStars = 300;
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2 + 1,
+                opacity: Math.random()
+            });
+        }
+
+        // Puntos para formar la flor (constelación)
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // Definir los puntos de la flor - más grande y detallada
+        const flowerPoints = [
+            // Centro de la flor (círculo interno)
+            { x: centerX, y: centerY - 100, label: 'centro' },
+            { x: centerX + 15, y: centerY - 100, label: 'centro-r' },
+            { x: centerX - 15, y: centerY - 100, label: 'centro-l' },
+            { x: centerX, y: centerY - 115, label: 'centro-t' },
+            { x: centerX, y: centerY - 85, label: 'centro-b' },
+            
+            // Pétalo 1 (superior)
+            { x: centerX, y: centerY - 115, label: 'p1-base' },
+            { x: centerX - 10, y: centerY - 150, label: 'p1-izq' },
+            { x: centerX + 10, y: centerY - 150, label: 'p1-der' },
+            { x: centerX, y: centerY - 170, label: 'p1-tip' },
+            
+            // Pétalo 2 (superior derecha)
+            { x: centerX + 15, y: centerY - 100, label: 'p2-base' },
+            { x: centerX + 45, y: centerY - 135, label: 'p2-izq' },
+            { x: centerX + 65, y: centerY - 115, label: 'p2-der' },
+            { x: centerX + 70, y: centerY - 140, label: 'p2-tip' },
+            
+            // Pétalo 3 (inferior derecha)
+            { x: centerX + 15, y: centerY - 100, label: 'p3-base' },
+            { x: centerX + 65, y: centerY - 85, label: 'p3-izq' },
+            { x: centerX + 45, y: centerY - 65, label: 'p3-der' },
+            { x: centerX + 70, y: centerY - 60, label: 'p3-tip' },
+            
+            // Pétalo 4 (inferior)
+            { x: centerX, y: centerY - 85, label: 'p4-base' },
+            { x: centerX + 10, y: centerY - 50, label: 'p4-izq' },
+            { x: centerX - 10, y: centerY - 50, label: 'p4-der' },
+            { x: centerX, y: centerY - 30, label: 'p4-tip' },
+            
+            // Pétalo 5 (inferior izquierda)
+            { x: centerX - 15, y: centerY - 100, label: 'p5-base' },
+            { x: centerX - 45, y: centerY - 65, label: 'p5-izq' },
+            { x: centerX - 65, y: centerY - 85, label: 'p5-der' },
+            { x: centerX - 70, y: centerY - 60, label: 'p5-tip' },
+            
+            // Pétalo 6 (superior izquierda)
+            { x: centerX - 15, y: centerY - 100, label: 'p6-base' },
+            { x: centerX - 65, y: centerY - 115, label: 'p6-izq' },
+            { x: centerX - 45, y: centerY - 135, label: 'p6-der' },
+            { x: centerX - 70, y: centerY - 140, label: 'p6-tip' },
+            
+            // Tallo (más puntos para más detalle)
+            { x: centerX, y: centerY - 30, label: 'tallo-1' },
+            { x: centerX + 3, y: centerY, label: 'tallo-2' },
+            { x: centerX - 3, y: centerY + 30, label: 'tallo-3' },
+            { x: centerX + 2, y: centerY + 60, label: 'tallo-4' },
+            { x: centerX, y: centerY + 90, label: 'tallo-5' },
+            { x: centerX, y: centerY + 120, label: 'tallo-6' },
+            
+            // Hoja izquierda
+            { x: centerX - 3, y: centerY + 30, label: 'hoja1-base' },
+            { x: centerX - 25, y: centerY + 45, label: 'hoja1-mid' },
+            { x: centerX - 50, y: centerY + 50, label: 'hoja1-tip' },
+            
+            // Hoja derecha
+            { x: centerX + 2, y: centerY + 60, label: 'hoja2-base' },
+            { x: centerX + 25, y: centerY + 75, label: 'hoja2-mid' },
+            { x: centerX + 45, y: centerY + 80, label: 'hoja2-tip' }
+        ];
+
+        // Conexiones para dibujar la flor
+        const connections = [
+            // Centro (círculo interno)
+            [0, 1], [0, 2], [0, 3], [0, 4],
+            [1, 3], [3, 2], [2, 4], [4, 1],
+            
+            // Pétalo 1
+            [5, 6], [6, 8], [8, 7], [7, 5],
+            [0, 5],
+            
+            // Pétalo 2
+            [9, 10], [10, 12], [12, 11], [11, 9],
+            [1, 9],
+            
+            // Pétalo 3
+            [13, 14], [14, 16], [16, 15], [15, 13],
+            [1, 13],
+            
+            // Pétalo 4
+            [17, 18], [18, 20], [20, 19], [19, 17],
+            [4, 17],
+            
+            // Pétalo 5
+            [21, 22], [22, 24], [24, 23], [23, 21],
+            [2, 21],
+            
+            // Pétalo 6
+            [25, 26], [26, 28], [28, 27], [27, 25],
+            [2, 25],
+            
+            // Tallo
+            [29, 30], [30, 31], [31, 32], [32, 33], [33, 34],
+            
+            // Hoja izquierda
+            [35, 36], [36, 37],
+            
+            // Hoja derecha
+            [38, 39], [39, 40]
+        ];
+
+        function drawStars() {
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.fill();
+            });
+        }
+
+        function drawConstellation() {
+            // Dibujar líneas de conexión
+            ctx.strokeStyle = 'rgba(255, 192, 203, 0.6)';
+            ctx.lineWidth = 2;
+            
+            connections.forEach(([startIdx, endIdx]) => {
+                const start = flowerPoints[startIdx];
+                const end = flowerPoints[endIdx];
+                
+                ctx.beginPath();
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+                ctx.stroke();
+            });
+
+            // Dibujar puntos (estrellas de la constelación)
+            flowerPoints.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffb6c1';
+                ctx.fill();
+                
+                // Borde brillante
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+        }
+
+        function animate() {
+            ctx.fillStyle = '#0a0a15';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Animar estrellas (parpadeo)
+            stars.forEach(star => {
+                star.opacity += (Math.random() - 0.5) * 0.1;
+                star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+            });
+            
+            drawStars();
+            drawConstellation();
+            
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Ajustar canvas al cambiar tamaño de ventana
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Recalcular posiciones de la flor
+            const newCenterX = canvas.width / 2;
+            const newCenterY = canvas.height / 2;
+            
+            flowerPoints.forEach(point => {
+                point.x += (newCenterX - centerX);
+                point.y += (newCenterY - centerY);
+            });
+        });
+    </script>
+</body>
+
+</html>
